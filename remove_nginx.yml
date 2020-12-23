@@ -1,0 +1,24 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: yes
+  tasks:
+  - name: Remove nginx
+    notify: disable and stop nginx
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+      state: absent
+    with_items:
+            - nginx
+            - nginx-core
+            - nginx-common
+    when: ansible_distribution == "Ubuntu"
+  handlers:
+  - name: disable and stop nginx
+    service:
+      name: nginx
+      enabled: no
+      state: stopped
+
