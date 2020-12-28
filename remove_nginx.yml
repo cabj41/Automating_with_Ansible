@@ -4,21 +4,41 @@
   become: true
   gather_facts: yes
   tasks:
+#Remove apt package
   - name: Remove nginx
     notify: disable and stop nginx
     apt:
       name: "{{ item }}"
       update_cache: yes
       state: absent
-    with_items:
-            - nginx
-            - nginx-core
-            - nginx-common
+    loop:
+      - nginx
+      - nginx-core
+      - nginx-common
     when: ansible_distribution == "Ubuntu"
+#Remove yum package
+  - name: Remove nginx and httpd
+    yum: 
+      name: "{{ item }}"
+      update_cache: yes
+      state: absent
+    loop:
+      - nginx
+      - nginx-core
+      - nginx-common
+      - nginx-filesystem
+      - httpd
+      - httpd-tools
+    when: ansible_os_family == 'RedHat'
   handlers:
   - name: disable and stop nginx
     service:
       name: nginx
+      enabled: no
+      state: stopped
+  - name: disable and stop httpd
+    service:
+      name: httpd
       enabled: no
       state: stopped
 
