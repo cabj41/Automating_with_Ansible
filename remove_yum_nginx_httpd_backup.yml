@@ -1,0 +1,21 @@
+- hosts: all
+  become: true
+  gather_facts: yes
+  tasks:
+
+#Remove yum package
+  - name: Remove nginx and httpd
+    notify: disable and stop nginx and httpd
+    yum:
+      name: "{{ item }}"
+      update_cache: yes
+      state: absent
+    with_items:
+            - nginx
+            - nginx-core
+            - nginx-common
+            - nginx-filesystem
+            - httpd
+            - httpd-tools
+    when: ansible_distribution == "CentOS"
+
