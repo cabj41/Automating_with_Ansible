@@ -5,27 +5,21 @@
   gather_facts: yes
   tasks:
 
-#update apt
-  - name: update apt repository index
+  - name: install nginx and php-fpm packages (Ubuntu)
     apt:
+      name: 
+        - nginx
+        - php-fpm
+      state: latest
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
-        
-  - name: install nginx package
-    apt:
-      name: nginx
-      state: latest
-    when: ansible_distribution == "Ubuntu"
 
-#update yum
-  - name: update yum repository index
+  - name: install httpd and php packages (CentOS)
     yum:
+      name:
+        - httpd
+        - php
+      state: latest
       update_cache: yes
-    when: ansible_distribution == "CentOS"
-
-  - name: install httpd package
-    yum:
-      name: httpd
-      state: latest
     when: ansible_distribution == "CentOS"
 
