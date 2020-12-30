@@ -1,0 +1,62 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: yes
+  pre_tasks:
+
+  - name: install updates (CentOS)
+    yum:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install updates (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: web_servers
+  become: true
+  gather_facts: yes
+  tasks:
+
+  - name: install nginx and php-fpm packages on (Ubuntu)
+    apt:
+      name: 
+        - nginx
+        - php-fpm
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install httpd and php  packages on (CentOS)
+    yum:
+      name:
+        - httpd
+        - php
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+- hosts: MySQL_db
+  become: true
+  tasks:
+
+  - name: install mariadb package (CentOS)
+    yum:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: install samba package
+    package:
+      name: samba
+
+
