@@ -53,6 +53,25 @@
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
 
+  - name: copy default html file for site (Ubuntu)
+    tags: nginx,ubuntu
+    copy:
+      src: default_site.html
+      dest: /usr/share/nginx/html/index.html 
+      owner: root
+      group: root
+      mode: 0644
+    when: ansible_distribution == "Ubuntu"
+    register: nginx
+
+  - name: restart nginx (Ubuntu)
+    tags: nginx,ubuntu,service
+    service:
+      name: nginx
+      state: restarted
+      enabled: yes
+    when: nginx.changed
+
   - name: install httpd and php  packages on (CentOS)
     tags: httpd,php,centos
     yum:
@@ -62,16 +81,41 @@
       state: latest
       update_cache: yes
     when: ansible_distribution == "CentOS"
- 
-  - name: copy default html file for site
-    tags: httpd
+
+  - name: change e-mail address for admin user (CentOS)
+    tags: httpd,centos
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin somebody@mail.com
+    when: ansible_distribution == "CentOS"
+    register: httpd_email
+
+  - name: copy default html file for site (CentOS)
+    tags: httpd,centos
     copy:
       src: default_site.html
       dest: /var/www/html/index.html
       owner: root
       group: root
       mode: 0644
-    when: ansible_distribution == "CentOS" 
+    when: ansible_distribution == "CentOS"
+    register: httpd_index 
+
+  - name: start httpd (CentOS)
+    tags: httpd,centos
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: restart httpd (CentOS)
+    tags: httpd,centos
+    service:
+      name: httpd
+      state: restarted
+    when: httpd_email.changed or httpd_index.changed
 
 
 - hosts: MySQL_db
