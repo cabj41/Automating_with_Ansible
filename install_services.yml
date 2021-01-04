@@ -6,19 +6,25 @@
   gather_facts: yes
   pre_tasks:
 
-  - name: install updates (CentOS)
+  - name: update cache (CentOS)
     tags: always
     yum:
-      update_only: yes
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "CentOS"
 
-  - name: install updates (Ubuntu)
+  - name: update cache (Ubuntu)
     tags: always
     apt:
-      upgrade: dist
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == "Ubuntu"
+
+  - name: add ssh key for riquelme
+    tags: always
+    authorized_key:
+      user: riquelme
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5UwxAsj+duc7ZZ8C3sh3DjF9MSYvS5o9WY3BXQKsbP ansible master key"
 
 
 - hosts: workstations
