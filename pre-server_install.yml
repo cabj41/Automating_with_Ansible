@@ -1,0 +1,48 @@
+---
+
+
+- hosts: all
+  become: true
+  gather_facts: yes
+  pre_tasks:
+
+  - name: install updates (CentOS)
+    tags: always
+    yum:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create riquelme user
+    tags: always
+    user:
+      name: riquelme
+      groups: root
+
+  - name: add ssh key for riquelme
+    tags: always
+    authorized_key:
+      user: riquelme
+      key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5UwxAsj+duc7ZZ8C3sh3DjF9MSYvS5o9WY3BXQKsbP ansible master key"
+
+  - name: add sudoers file for riquelme
+    tags: always
+    copy:
+      src: sudoer_riquelme
+      dest: /etc/sudoers.d/riquelme
+      owner: root
+      group: root
+      mode: 0440
+
